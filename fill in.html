@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIT 152 - 300 Fill-in-the-Blank University Exam Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .blank-input {
+            border-bottom: 2px solid #4b5563;
+            background-color: transparent;
+            text-align: center;
+            font-weight: 600;
+            color: #1d4ed8;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .blank-input:focus {
+            border-bottom-color: #2563eb;
+            background-color: #eff6ff;
+        }
+        .correct-bg {
+            background-color: #dcfce7 !important;
+            border-bottom-color: #16a34a !important;
+            color: #15803d !important;
+        }
+        .incorrect-bg {
+            background-color: #fee2e2 !important;
+            border-bottom-color: #dc2626 !important;
+            color: #b91c1c !important;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .blank-input { border-bottom: 1px solid #000; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div>
+                <h1 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-[#4f46e5] fa-graduation-cap text-yellow-400"></i>
+                    BIT 152: Exam Question Bank
+                </h1>
+                <p class="text-xs text-indigo-200">300 University Exam Fill-in-the-Blank Questions & Answers</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="checkAllBtn" onclick="checkAllAnswers()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-semibold shadow transition">
+                    <i class="fa-solid fa-check-double mr-1"></i> Check All
+                </button>
+                <button id="revealAllBtn" onclick="toggleRevealAll()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-2 rounded-lg font-semibold shadow transition">
+                    <i class="fa-solid fa-eye mr-1"></i> <span id="revealText">Reveal Answers</span>
+                </button>
+                <button onclick="resetAll()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg font-semibold shadow transition">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                </button>
+                <button onclick="window.print()" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg font-semibold shadow transition">
+                    <i class="fa-solid fa-print mr-1"></i> Print
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Score & Progress Bar -->
+    <div class="bg-indigo-800 text-white py-2 px-4 shadow-inner no-print">
+        <div class="max-w-7xl mx-auto flex justify-between items-center text-xs sm:text-sm">
+            <div id="progressText">Progress: 0 / 300 Answered</div>
+            <div class="w-1/3 bg-indigo-950 rounded-full h-2.5 overflow-hidden">
+                <div id="progressBar" class="bg-green-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div id="scoreText" class="font-bold text-yellow-300">Score: 0 / 300 (0%)</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+        
+        <!-- Controls & Filters -->
+        <div class="bg-white p-4 rounded-xl shadow-md mb-6 no-print flex flex-wrap gap-4 justify-between items-center border border-slate-200">
+            <div class="flex items-center gap-2 flex-grow max-w-md">
+                <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="filterQuestions()" placeholder="Search questions by keyword..." class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="categoryFilter" class="text-xs font-bold text-slate-600">Module Filter:</label>
+                <select id="categoryFilter" onchange="filterQuestions()" class="text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50">
+                    <option value="all">All Modules (300 Questions)</option>
+                    <option value="1">1. Internet History & Governance (Q1-Q20)</option>
+                    <option value="2">2. IP Addressing & Domain Names (Q21-Q40)</option>
+                    <option value="3">3. TCP/IP & Packet Switching (Q41-Q60)</option>
+                    <option value="4">4. Internet Architecture & ISPs (Q61-Q75)</option>
+                    <option value="5">5. Web Protocols, HTTP/S & URLs (Q76-Q95)</option>
+                    <option value="6">6. Netiquette, Phishing & Security (Q96-Q115)</option>
+                    <option value="7">7. Guided Transmission Media (Q116-Q140)</option>
+                    <option value="8">8. Communication & Switching (Q141-Q155)</option>
+                    <option value="9">9. OSI Model & Network Devices (Q156-Q175)</option>
+                    <option value="10">10. HTML, DOM, CSS & E-Commerce (Q176-Q200)</option>
+                    <option value="11">11. Network Media & Transmission (Q201-Q225)</option>
+                    <option value="12">12. Switching, Topologies & OSI (Q226-Q250)</option>
+                    <option value="13">13. Network Devices & Wireless (Q251-Q275)</option>
+                    <option value="14">14. Internet Services & HTML (Q276-Q300)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Question List Container -->
+        <div id="questionsContainer" class="space-y-4"></div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-center text-xs py-6 mt-8 no-print border-t border-slate-800">
+        <p>BIT 152 Fundamentals of Information Technology II — Comprehensive Exam Preparation Bank</p>
+        <p class="mt-1 text-slate-500">Includes all topics: Internet Architecture, Protocols, Networking, Security, HTML/CSS, and E-Commerce.</p>
+    </footer>
+
+    <script>
+        const questionsData = [
+            // Module 1: Internet History & Governance (1-20)
+            { id: 1, cat: 1, text: "The Internet originated in September 1969 as a project known as _____.", ans: "ARPANET", hint: "Four letter acronym by US DoD", exp: "ARPANET was created by the U.S. Department of Defense's Advanced Research Projects Agency.[cite: 1]" },
+            { id: 2, cat: 1, text: "The U.S. agency that originally funded the creation of the precursor to the Internet was _____.", ans: "ARPA", hint: "Advanced Research Projects Agency", exp: "ARPA (Advanced Research Projects Agency) funded the initial research.[cite: 1]" },
+            { id: 3, cat: 1, text: "In 1986, the National Science Foundation connected its network named _____ to ARPANET.", ans: "NSFnet", hint: "Network established by NSF", exp: "NSFnet connected to ARPANET, starting the transformation into the modern Internet.[cite: 1]" },
+            { id: 4, cat: 1, text: "The organization that oversees research and sets guidelines and standards for the World Wide Web is abbreviated as _____.", ans: "W3C", hint: "World Wide Web Consortium", exp: "The World Wide Web Consortium (W3C) sets global standards for the Web.[cite: 1]" },
+            { id: 5, cat: 1, text: "By the year 1984, ARPANET had linked more than _____ individual computers as hosts.", ans: "1000", hint: "Number in thousands", exp: "ARPANET grew to over 1,000 linked host computers by 1984.[cite: 1]" },
+            { id: 6, cat: 1, text: "NSFNet terminated its network on the Internet and resumed its status strictly as a research network in the year _____.", ans: "1995", hint: "Mid-1990s year", exp: "In 1995, NSFNet pulled out, opening the Internet to full commercialization.[cite: 1]" },
+            { id: 7, cat: 1, text: "A high-speed research network founded in 1996 by higher education institutions to develop advanced network applications is called _____.", ans: "Internet2", hint: "Next generation Internet project", exp: "Internet2 was founded in 1996 as a non-profit consortium for research and education.[cite: 1]" },
+            { id: 8, cat: 1, text: "At the heart of most computer networks is a fast computer with large memory and storage space called a _____.", ans: "server", hint: "Central host machine", exp: "A server manages network resources and controls communication between attached devices.[cite: 1]" },
+            { id: 9, cat: 1, text: "One of the two original goals of ARPANET was to function even if part of the network were disabled or destroyed by a _____.", ans: "disaster", hint: "Catastrophic event or war", exp: "ARPANET was designed to maintain operational integrity during wartime or disasters.[cite: 1]" },
+            { id: 10, cat: 1, text: "The term used to describe the Internet as a global infrastructure joining multiple distinct networks is a 'network of _____'.", ans: "networks", hint: "Plural form of network", exp: "The Internet is defined as a global 'network of networks'.[cite: 1]" },
+            { id: 11, cat: 1, text: "Responsibility for Internet administration shifted over time to organizations including the National _____ Foundation.", ans: "Science", hint: "Academic foundation (NSF)", exp: "The National Science Foundation (NSF) played a pivotal role in transitioning ARPANET.[cite: 1]" },
+            { id: 12, cat: 1, text: "Today, each individual organization connected to the Internet is responsible only for maintaining its own _____.", ans: "network", hint: "Local infrastructure", exp: "The Internet lacks central ownership; each entity maintains its own portion.[cite: 1]" },
+            { id: 13, cat: 1, text: "In the evolution of the Internet, computers were initially installed at U.S. _____ with defense-related projects.", ans: "universities", hint: "Institutions of higher learning", exp: "ARPANET nodes were first installed at university research sites.[cite: 1]" },
+            { id: 14, cat: 1, text: "The Internet acts as a pipeline to transport electronic _____ from one network to another.", ans: "messages", hint: "Digital data communications", exp: "Its core operational role is transporting electronic messages across boundaries.[cite: 1]" },
+            { id: 15, cat: 1, text: "The evolution of ARPANET changed its scope from purely military use to _____ use before commercialization.", ans: "scientific", hint: "Academic research domain", exp: "Scientists adopted ARPANET, shifting its primary focus to scientific collaboration.[cite: 1]" },
+            { id: 16, cat: 1, text: "Today, more than _____ million hosts are connected to the global Internet.", ans: "550", hint: "Number stated in course slides", exp: "Course slides note that over 550 million hosts connect to the Internet.[cite: 1]" },
+            { id: 17, cat: 1, text: "The server on a network controls the communication of information between attached devices such as computers and _____.", ans: "printers", hint: "Peripheral output device", exp: "Servers coordinate shared hardware resources like printers and storage.[cite: 1]" },
+            { id: 18, cat: 1, text: "Before commercial funding, the Internet shifted from a science-oriented network to a commercially funded network due to the involvement of the _____.", ans: "NSF", hint: "Three letter agency acronym", exp: "NSF's backbone infrastructure enabled commercial expansion.[cite: 1]" },
+            { id: 19, cat: 1, text: "A central philosophy of Internet architecture is that it is designed to operate without a _____ control.", ans: "central", hint: "Single point of authority", exp: "Decentralized control ensures resiliency against localized node failures.[cite: 1]" },
+            { id: 20, cat: 1, text: "The World Wide Web Consortium (W3C) was founded to ensure the long-term growth of the Web by setting _____.", ans: "standards", hint: "Or guidelines", exp: "W3C develops open specifications and standards like HTML and CSS.[cite: 1]" },
+
+            // Module 2: IP Addressing & Domain Names (21-40)
+            { id: 21, cat: 2, text: "A number that uniquely identifies each computer or device connected to the Internet is an _____ address.", ans: "IP", hint: "Two letter protocol abbreviation", exp: "An IP (Internet Protocol) address provides a unique numerical identifier.[cite: 1]" },
+            { id: 22, cat: 2, text: "The readable text version of a numerical IP address is called a _____ name.", ans: "domain", hint: "e.g., google.com", exp: "Domain names serve as human-friendly aliases for IP addresses.[cite: 1]" },
+            { id: 23, cat: 2, text: "The server responsible for translating a domain name into its corresponding IP address is a _____ server.", ans: "DNS", hint: "Domain Name System", exp: "Domain Name System (DNS) servers translate names like knust.edu.gh to numeric IPs.[cite: 1]" },
+            { id: 24, cat: 2, text: "In a full domain name, the last field is known as the top-level _____.", ans: "domain", hint: "TLD suffix", exp: "The last part (e.g., .com, .edu) is the Top-Level Domain (TLD).[cite: 1]" },
+            { id: 25, cat: 2, text: "In a domain name, the first field represents the _____ name, which identifies a single computer or organization.", ans: "host", hint: "Machine or server identifier", exp: "The host name identifies the specific server or organization sub-unit.[cite: 1]" },
+            { id: 26, cat: 2, text: "The generic top-level domain '.edu' is reserved specifically for _____ institutions.", ans: "educational", hint: "Colleges and universities", exp: ".edu is allocated to higher education academic bodies.[cite: 1]" },
+            { id: 27, cat: 2, text: "The generic top-level domain '.gov' is restricted for use by _____ agencies.", ans: "government", hint: "State/Federal public entities", exp: ".gov is restricted to government organizations.[cite: 1]" },
+            { id: 28, cat: 2, text: "The top-level domain '.mil' is designated for _____ organizations.", ans: "military", hint: "Armed forces", exp: ".mil is reserved for military entities.[cite: 1]" },
+            { id: 29, cat: 2, text: "The generic top-level domain '.org' was originally intended for _____ organizations.", ans: "nonprofit", hint: "Non-commercial entities", exp: ".org is traditionally used by non-profit organizations.[cite: 1]" },
+            { id: 30, cat: 2, text: "The top-level domain '.biz' is designed for businesses of all _____.", ans: "sizes", hint: "Dimensions / scale", exp: ".biz is aimed at commercial businesses regardless of size.[cite: 1]" },
+            { id: 31, cat: 2, text: "The top-level domain intended specifically for aviation community members is _____.", ans: "aero", hint: "Aeronautical suffix", exp: ".aero is a sponsored top-level domain for the aviation industry.[cite: 1]" },
+            { id: 32, cat: 2, text: "The generic top-level domain '.mobi' is used for the delivery and management of _____ Internet services.", ans: "mobile", hint: "Cellular/handheld devices", exp: ".mobi signifies sites optimized for mobile devices.[cite: 1]" },
+            { id: 33, cat: 2, text: "The top-level domain '.pro' is restricted to certified _____ such as doctors, lawyers, and accountants.", ans: "professionals", hint: "Licensed practitioners", exp: ".pro is reserved for credentialed, licensed professionals.[cite: 1]" },
+            { id: 34, cat: 2, text: "The generic top-level domain intended for accredited museums is _____.", ans: "museum", hint: "Cultural institute suffix", exp: ".museum is a restricted TLD for accredited museum organizations.[cite: 1]" },
+            { id: 35, cat: 2, text: "The top-level domain '.coop' is intended for business cooperatives such as credit _____.", ans: "unions", hint: "Financial co-ops", exp: ".coop is reserved for cooperative associations.[cite: 1]" },
+            { id: 36, cat: 2, text: "The generic top-level domain intended for the Catalan cultural community is _____.", ans: "cat", hint: "Three letter regional TLD", exp: ".cat is a linguistic/cultural domain for the Catalan community.[cite: 1]" },
+            { id: 37, cat: 2, text: "The generic top-level domain '.com' stands for _____ organizations and businesses.", ans: "commercial", hint: "For-profit ventures", exp: ".com represents commercial enterprise websites.[cite: 1]" },
+            { id: 38, cat: 2, text: "The generic top-level domain designated for employment or human resource businesses is _____.", ans: "jobs", hint: "Employment related", exp: ".jobs is reserved for recruitment and HR entities.[cite: 1]" },
+            { id: 39, cat: 2, text: "In an IP address like '72.14.207.99', the numbers are separated by _____.", ans: "dots", hint: "Or periods", exp: "IPv4 addresses use dotted-decimal notation.[cite: 1]" },
+            { id: 40, cat: 2, text: "The generic top-level domain intended specifically for the travel industry is _____.", ans: "travel", hint: "Tourism/Travel industry", exp: ".travel is dedicated to travel and tourism services.[cite: 1]" },
+
+            // Module 3: TCP/IP & Packet Switching (41-60)
+            { id: 41, cat: 3, text: "The primary suite of communication protocols used for transmitting data on the Internet is _____.", ans: "TCP/IP", hint: "Transmission Control Protocol / Internet Protocol", exp: "TCP/IP is the fundamental communication protocol stack of the Internet.[cite: 1]" },
+            { id: 42, cat: 3, text: "In the TCP/IP protocol suite, the part responsible for reliable transport and breaking messages into packets is _____.", ans: "TCP", hint: "Transmission Control Protocol", exp: "TCP provides reliable transport by packetizing data and ensuring intact arrival.[cite: 1]" },
+            { id: 43, cat: 3, text: "In TCP/IP, the protocol responsible for addressing and dispatching packets across multiple networks is _____.", ans: "IP", hint: "Internet Protocol", exp: "IP handles addressing and routing of packets across heterogeneous networks.[cite: 1]" },
+            { id: 44, cat: 3, text: "TCP converts long messages into small units called _____ at the source computer.", ans: "packets", hint: "Data segments", exp: "Messages are divided into packets for efficient network transport.[cite: 1]" },
+            { id: 45, cat: 3, text: "The technique where messages are divided into independent packets and routed across a network is called packet _____.", ans: "switching", hint: "Routing methodology", exp: "Packet switching routes individual packets dynamically without fixed channels.[cite: 1]" },
+            { id: 46, cat: 3, text: "Each packet created by TCP contains address information, error control information, and _____ information.", ans: "sequencing", hint: "Ordering data", exp: "Sequencing information allows packets to be reassembled in original order.[cite: 1]" },
+            { id: 47, cat: 3, text: "The component of a packet used at the destination to verify that data was not corrupted during transmission is the _____ control information.", ans: "error", hint: "Integrity check", exp: "Error control bytes (checksums) check if the packet arrived intact.[cite: 1]" },
+            { id: 48, cat: 3, text: "Because packets can travel via different paths, they may arrive at their destination out of _____.", ans: "order", hint: "Sequence", exp: "Individual packets take optimal routes and can arrive out of order.[cite: 1]" },
+            { id: 49, cat: 3, text: "At the destination host, TCP uses sequencing information to _____ the packets into the original message.", ans: "reassemble", hint: "Put back together", exp: "TCP puts arriving out-of-order packets back in sequential order.[cite: 1]" },
+            { id: 50, cat: 3, text: "Unlike circuit switching, packet switching does not require a dedicated _____ connection between sender and receiver.", ans: "physical", hint: "Fixed transmission channel", exp: "Packet switching dynamically shares links rather than allocating a dedicated physical circuit.[cite: 1]" },
+            { id: 51, cat: 3, text: "The control information appended to packet payload data is contained within the packet _____.", ans: "header", hint: "Leading metadata section", exp: "Packet headers store routing addresses, sequence numbers, and length.[cite: 1]" },
+            { id: 52, cat: 3, text: "Packet switching uses a 'store and _____' mechanism at intermediate routing nodes.", ans: "forward", hint: "Relay mechanism", exp: "Routers store full incoming packets briefly before forwarding them along the path.[cite: 1]" },
+            { id: 53, cat: 3, text: "Packet switching is especially suited for _____ traffic because it limits packet size and avoids long line blockages.", ans: "interactive", hint: "Real-time or user request traffic", exp: "Interactive traffic benefits from low latency without holding lines idle.[cite: 1]" },
+            { id: 54, cat: 3, text: "TCP/IP protocol makes it possible for computers to communicate regardless of differences in their underlying _____.", ans: "hardware", hint: "Physical machine architecture", exp: "TCP/IP abstracts hardware differences (CPUs, operating systems, memory size).[cite: 1]" },
+            { id: 55, cat: 3, text: "In packet switching, the max size of a packet is _____ to prevent network nodes from being blocked too long.", ans: "limited", hint: "Bounded size", exp: "Capping packet size prevents large transfers from monopolizing network bandwidth.[cite: 1]" },
+            { id: 56, cat: 3, text: "A major advantage of TCP is that it provides a _____ transport service, ensuring intact delivery.", ans: "reliable", hint: "Trustworthy / error-checked", exp: "Reliability means missing or corrupted packets are retransmitted.[cite: 1]" },
+            { id: 57, cat: 3, text: "The address field in a packet header is primarily used by routers to _____ the packet to its target destination.", ans: "route", hint: "Direct or dispatch", exp: "Destination IP addresses guide routing choices at each hop.[cite: 1]" },
+            { id: 58, cat: 3, text: "The TCP/IP suite model consists of _____ functional layers, compared to the 7-layer OSI model.", ans: "5", hint: "Number of layers in TCP/IP", exp: "The TCP/IP model is typically structured into 5 layers.[cite: 1]" },
+            { id: 59, cat: 3, text: "The switching technique that reserves a dedicated physical path for the entire duration of a call/session is _____ switching.", ans: "circuit", hint: "Traditional telephone system tech", exp: "Circuit switching allocates a continuous dedicated connection for the entire session.[cite: 1]" },
+            { id: 60, cat: 3, text: "The switching technique that transmits a complete message as one unit through intermediate nodes without splitting it into small packets is _____ switching.", ans: "message", hint: "Whole-message store-and-forward", exp: "Message switching passes entire messages from node to node.[cite: 1]" },
+
+            // Module 4: Internet Architecture & ISPs (61-75)
+            { id: 61, cat: 4, text: "In the hierarchical structure of the Internet, the user or client computer operates at the _____ level.", ans: "lowest", hint: "Bottom tier", exp: "Clients sit at the base level of the Internet operational hierarchy.[cite: 1]" },
+            { id: 62, cat: 4, text: "An entity that provides individuals and organizations access to the Internet for a fee is an _____.", ans: "ISP", hint: "Internet Service Provider acronym", exp: "Internet Service Providers (ISPs) provide connectivity.[cite: 1]" },
+            { id: 63, cat: 4, text: "A Local ISP is typically located in the telephone switching office where the client's telephone line _____.", ans: "terminates", hint: "Ends or connects", exp: "Local ISPs connect subscribers at local telephone exchange switching offices.[cite: 1]" },
+            { id: 64, cat: 4, text: "At the top of the Internet architecture hierarchy are high-speed major networks known as the _____.", ans: "backbone", hint: "Core network infrastructure", exp: "The Internet backbone consists of ultra-high-capacity principal data routes.[cite: 1]" },
+            { id: 65, cat: 4, text: "Backbone operators are large corporations that maintain massive server farms connected via high-speed _____ cables.", ans: "fiber-optics", hint: "Light-transmitting cables", exp: "Backbones use high-bandwidth fiber-optic trunks to handle massive data loads.[cite: 1]" },
+            { id: 66, cat: 4, text: "Different backbone networks are linked together to exchange traffic at location points called _____ Access Points.", ans: "Network", hint: "NAP acronym component", exp: "Network Access Points (NAPs) interconnect separate backbone networks.[cite: 1]" },
+            { id: 67, cat: 4, text: "Network Access Points are abbreviated as _____.", ans: "NAP", hint: "Three letter acronym", exp: "NAP stands for Network Access Point.[cite: 1]" },
+            { id: 68, cat: 4, text: "Backbone networks connect to Regional ISPs through intermediate forwarding devices known as _____.", ans: "routers", hint: "Packet forwarding hardware", exp: "Routers direct incoming backbone traffic toward appropriate regional networks.[cite: 1]" },
+            { id: 69, cat: 4, text: "If a packet at a backbone is destined for a different backbone, it is routed through a _____.", ans: "NAP", hint: "Interconnection point", exp: "Packets traverse NAPs when moving from one backbone provider to another.[cite: 1]" },
+            { id: 70, cat: 4, text: "The Internet architecture is built to be resilient; if a portion fails, connections are made through _____ paths.", ans: "alternative", hint: "Backup/rerouted paths", exp: "Mesh architecture permits automatic rerouting along alternative paths.[cite: 1]" },
+            { id: 71, cat: 4, text: "An example of a major telecommunications corporation operating an Internet backbone is _____.", ans: "AT&T", hint: "Major US telecom giant mentioned in slides", exp: "AT&T is cited in the course slides as a prominent backbone operator.[cite: 1]" },
+            { id: 72, cat: 4, text: "The hierarchy level immediately above Local ISPs consists of _____ ISPs.", ans: "Regional", hint: "Mid-level providers", exp: "Regional ISPs aggregate traffic between Local ISPs and major backbones.[cite: 1]" },
+            { id: 73, cat: 4, text: "When a packet arrives at a backbone node intended for a regional provider, it is sent to the closest _____ to be routed.", ans: "router", hint: "Networking device", exp: "Routers evaluate packet headers to direct data toward the closest regional link.[cite: 1]" },
+            { id: 74, cat: 4, text: "Large collections of servers operated by backbone providers are known as server _____.", ans: "farms", hint: "Data center aggregation", exp: "Server farms house thousands of coordinated high-performance servers.[cite: 1]" },
+            { id: 75, cat: 4, text: "Because the Internet has no single controlling authority, its structural design is described as operating without _____ control.", ans: "central", hint: "Unified single management", exp: "Decentralized architecture prevents global system failure.[cite: 1]" },
+
+            // Module 5: Web Protocols, HTTP/S & URLs (76-95)
+            { id: 76, cat: 5, text: "The formatting standard used to create structured hypermedia documents on the Web is _____.", ans: "HTML", hint: "Hypertext Markup Language", exp: "HTML (Hypertext Markup Language) defines page structure.[cite: 1]" },
+            { id: 77, cat: 5, text: "To identify a web page's exact location on a computer, web browsers rely on a _____ Resource Locator.", ans: "Uniform", hint: "URL expansion word 1", exp: "URL stands for Uniform Resource Locator.[cite: 1]" },
+            { id: 78, cat: 5, text: "The exact location address of a web document is abbreviated as _____.", ans: "URL", hint: "3 letter address acronym", exp: "URL is the standard abbreviation.[cite: 1]" },
+            { id: 79, cat: 5, text: "The primary protocol used to transfer hypertext documents and files across the World Wide Web is _____.", ans: "HTTP", hint: "Hypertext Transfer Protocol", exp: "HTTP handles client-server web requests and responses.[cite: 1]" },
+            { id: 80, cat: 5, text: "The secure version of HTTP that encrypts data transfers between browser and server is _____.", ans: "HTTPS", hint: "HTTP with Security suffix", exp: "HTTPS uses TLS/SSL encryption to secure communications.[cite: 1]" },
+            { id: 81, cat: 5, text: "A URL typically consists of four parts: transfer protocol, domain name, filename, and _____ path.", ans: "pathname", hint: "Folder/Directory location", exp: "The pathname indicates the specific directory folder hosting the file.[cite: 1]" },
+            { id: 82, cat: 5, text: "Besides HTTP, another standard protocol used to transfer files between network hosts is _____.", ans: "FTP", hint: "File Transfer Protocol", exp: "File Transfer Protocol (FTP) is dedicated to uploading/downloading files.[cite: 1]" },
+            { id: 83, cat: 5, text: "A protocol that allows a user to establish a virtual terminal connection for remote host login is _____.", ans: "Telnet", hint: "Remote login protocol", exp: "Telnet provides text-based remote command-line access.[cite: 1]" },
+            { id: 84, cat: 5, text: "HTTPS protects users against packet eavesdropping and Man-in-the-_____ attacks.", ans: "Middle", hint: "MitM attack name", exp: "MitM (Man-in-the-Middle) attacks intercept and tamper with unencrypted traffic.[cite: 1]" },
+            { id: 85, cat: 5, text: "When a secure HTTPS connection is properly established, modern web browsers display a closed _____ icon in the address bar.", ans: "padlock", hint: "Security lock graphic", exp: "A closed padlock indicates an active, authenticated TLS connection.[cite: 1]" },
+            { id: 86, cat: 5, text: "Web 2.0 is characterized by an emphasis on user-generated content, usability, and social _____.", ans: "interactivity", hint: "Or user participation", exp: "Web 2.0 marked a shift from static web pages to interactive user-generated content.[cite: 1]" },
+            { id: 87, cat: 5, text: "A small preview version of a larger image on a web page is called a _____.", ans: "thumbnail", hint: "Miniature image graphic", exp: "Thumbnails are reduced-size previews of larger images.[cite: 1]" },
+            { id: 88, cat: 5, text: "In web multimedia, any application that combines text with graphics, audio, video, or animation is called _____.", ans: "multimedia", hint: "Multiple media forms combined", exp: "Multimedia integrates interactive graphics, sound, and video.[cite: 1]" },
+            { id: 89, cat: 5, text: "If a web browser detects an invalid digital certificate, it displays a warning stating 'Your connection is not _____'.", ans: "private", hint: "Chrome security warning message", exp: "Invalid or untrusted certificates trigger a 'Your connection is not private' browser alert.[cite: 1]" },
+            { id: 90, cat: 5, text: "A website's digital certificate must be issued by a trusted entity called a Certificate _____.", ans: "Authority", hint: "CA organization", exp: "Certificate Authorities (CAs) digitally sign and validate TLS certificates.[cite: 1]" },
+            { id: 91, cat: 5, text: "In the URL 'https://www.knust.edu.gh/academic-fees', 'https' represents the transfer _____.", ans: "protocol", hint: "Rule set", exp: "'https' is the transfer protocol specification.[cite: 1]" },
+            { id: 92, cat: 5, text: "In the URL 'https://www.knust.edu.gh/academic-fees', 'academic-fees' acts as the _____ or folder path.", ans: "pathname", hint: "Directory path", exp: "'academic-fees' identifies the specific path on the server.[cite: 1]" },
+            { id: 93, cat: 5, text: "Google (www.google.com) and Yahoo (www.yahoo.com) are examples of web search _____.", ans: "tools", hint: "Or search engines", exp: "Search engines/tools assist users in indexing and locating web resources.[cite: 1]" },
+            { id: 94, cat: 5, text: "Unencrypted HTTP connections transmit plain text passwords, making them vulnerable to packet _____.", ans: "sniffing", hint: "Eavesdropping / interception", exp: "Plaintext HTTP data can be intercepted and read by packet sniffers.[cite: 1]" },
+            { id: 95, cat: 5, text: "HTTPS encrypts communications using the _____ cryptographic protocol (successor to SSL).", ans: "TLS", hint: "Transport Layer Security acronym", exp: "Transport Layer Security (TLS) powers modern HTTPS encryption.[cite: 1]" },
+
+            // Module 6: Netiquette, Phishing & Security (96-115)
+            { id: 96, cat: 6, text: "The code of acceptable behaviors users should follow while on the Internet is known as _____.", ans: "Netiquette", hint: "Network etiquette combination", exp: "Netiquette blends 'network' and 'etiquette'.[cite: 1]" },
+            { id: 97, cat: 6, text: "Any intrusive software developed with malicious intent to disrupt or harm systems is called _____.", ans: "malware", hint: "Malicious software shorthand", exp: "Malware covers viruses, worms, ransomware, and spyware.[cite: 1]" },
+            { id: 98, cat: 6, text: "The fraudulent practice of sending emails pretending to be a trusted organization to trick users into revealing sensitive data is _____.", ans: "phishing", hint: "Fishing homophone", exp: "Phishing uses deception and social engineering to steal credentials.[cite: 1]" },
+            { id: 99, cat: 6, text: "Unwanted, unsolicited digital communications sent out in bulk to users are called _____.", ans: "spam", hint: "Junk communication", exp: "Spam consists of mass unsolicited promotional or malicious messages.[cite: 1]" },
+            { id: 100, cat: 6, text: "Software that automatically displays or downloads unwanted advertising material on a computer is called _____.", ans: "adware", hint: "Advertising software", exp: "Adware renders popup advertisements or alters search output.[cite: 1]" },
+            { id: 101, cat: 6, text: "Phishing messages often manufacture a false sense of _____ to panic victims into acting immediately.", ans: "urgency", hint: "Pressured time constraint", exp: "Threats of immediate account closure create panic and urgency.[cite: 1]" },
+            { id: 102, cat: 6, text: "A strong password should be over _____ characters in length and include letters, numbers, and symbols.", ans: "eight", hint: "Or 8", exp: "Standard guidelines mandate at least 8 characters with complex combinations.[cite: 1]" },
+            { id: 103, cat: 6, text: "Security recommendations advise users to change their passwords regularly, at least every _____ days.", ans: "90", hint: "Three months in days", exp: "Changing passwords every 90 days mitigates credential leak exposure.[cite: 1]" },
+            { id: 104, cat: 6, text: "To protect account privacy, passwords should avoid using personal details like your name, location, or _____.", ans: "birthday", hint: "Date of birth", exp: "Personal dates and names are vulnerable to simple dictionary/guessing attacks.[cite: 1]" },
+            { id: 105, cat: 6, text: "A website's policy explaining what personal information is collected and how it is used is its _____ policy.", ans: "privacy", hint: "Data collection rules document", exp: "Privacy policies outline data collection, storage, and sharing practices.[cite: 1]" },
+            { id: 106, cat: 6, text: "Stealing personal credentials to fraudulently access bank accounts or credit records is termed identity _____.", ans: "theft", hint: "Stealing identity", exp: "Identity theft involves impersonating someone using their stolen private credentials.[cite: 1]" },
+            { id: 107, cat: 6, text: "Phishing emails often direct users to a fake website that looks _____ to steal information.", ans: "legitimate", hint: "Authentic / real-looking", exp: "Spoofed websites mimic genuine login portals to deceive victims.[cite: 1]" },
+            { id: 108, cat: 6, text: "You should never reuse the same _____ for multiple online accounts.", ans: "password", hint: "Secret passphrase", exp: "Reusing passwords across sites causes cascading account compromise if one site leaks data.[cite: 1]" },
+            { id: 109, cat: 6, text: "Spam messages frequently contain fraudulent _____ that lead users to malicious sites.", ans: "links", hint: "Hyperlinks", exp: "Spam messages embed links to credential-harvesting or malware sites.[cite: 1]" },
+            { id: 110, cat: 6, text: "Legitimate businesses will never ask you to send sensitive passwords over unencrypted _____.", ans: "email", hint: "Electronic mail", exp: "Reputable companies do not solicit passwords via plaintext email messages.[cite: 1]" },
+            { id: 111, cat: 6, text: "To avoid malware infections, users should keep software and operating systems regularly _____.", ans: "updated", hint: "Patched / upgraded", exp: "Updates patch security vulnerabilities exploited by malware.[cite: 1]" },
+            { id: 112, cat: 6, text: "Phishers impersonate trusted entities such as banks, government agencies, or Internet _____ Providers.", ans: "Service", hint: "ISP middle word", exp: "Attackers commonly impersonate ISPs or financial institutions.[cite: 1]" },
+            { id: 113, cat: 6, text: "A type of attack where a hacker secretly intercepts and potentially alters communication between two parties is a _____ attack.", ans: "Man-in-the-Middle", hint: "MitM full name", exp: "MitM attacks eavesdrop on unencrypted sessions.[cite: 1]" },
+            { id: 114, cat: 6, text: "Before entering financial credentials online, you should verify that the site URL begins with _____.", ans: "https", hint: "Secure web scheme", exp: "'https' confirms encryption is enabled for transmission.[cite: 1]" },
+            { id: 115, cat: 6, text: "Adware can alter user search results in web _____ without explicit user consent.", ans: "browsers", hint: "Chrome, Firefox, etc.", exp: "Malicious adware hijacks browser settings to force ad redirects.[cite: 1]" },
+
+            // Module 7: Guided Transmission Media (116-140)
+            { id: 116, cat: 7, text: "Data transmission media where signals are guided along a solid physical path like wire or cable are called _____ media.", ans: "guided", hint: "Bounded physical channels", exp: "Guided media physically constrain signals within cables.[cite: 1]" },
+            { id: 117, cat: 7, text: "Data transmission media where signals travel through the open air without a solid physical conductor are called _____ media.", ans: "unguided", hint: "Wireless / unbounded", exp: "Unguided media transmit electromagnetic waves through air or space.[cite: 1]" },
+            { id: 118, cat: 7, text: "Copper wire facilitates signal travel over long distances because it offers low _____ to electrical currents.", ans: "resistance", hint: "Electrical friction property", exp: "Low resistance minimizes energy dissipation in metallic conductors.[cite: 1]" },
+            { id: 119, cat: 7, text: "Copper wire transmits data in the form of _____ signals.", ans: "electric", hint: "Voltage / current waves", exp: "Copper media conduct data as electrical voltage variations.[cite: 1]" },
+            { id: 120, cat: 7, text: "A twisted pair cable consists of four pairs of copper wires coated with insulating plastic or _____.", ans: "Teflon", hint: "Synthetic fluoropolymer insulator", exp: "Wires are coated in insulating material like plastic or Teflon.[cite: 1]" },
+            { id: 121, cat: 7, text: "In a twisted pair cable, twisting the copper wires reduces electromagnetic _____ from external sources.", ans: "interference", hint: "EMI / Noise disruption", exp: "Twisting cancels out external noise and crosstalk.[cite: 1]" },
+            { id: 122, cat: 7, text: "Twisted pair cable shielded with an extra layer of metal foil is abbreviated as _____.", ans: "STP", hint: "Shielded Twisted Pair", exp: "STP stands for Shielded Twisted Pair.[cite: 1]" },
+            { id: 123, cat: 7, text: "Unshielded twisted pair cable is abbreviated as _____.", ans: "UTP", hint: "Unshielded Twisted Pair", exp: "UTP stands for Unshielded Twisted Pair.[cite: 1]" },
+            { id: 124, cat: 7, text: "UTP is commonly used for short networking connections up to a maximum distance of _____ meters.", ans: "100", hint: "Standard Ethernet distance limit", exp: "Standard UTP cable runs are rated for maximum 100 meters.[cite: 1]" },
+            { id: 125, cat: 7, text: "Although UTP cable contains four wire pairs, Fast Ethernet communication uses only _____ pairs.", ans: "two", hint: "Or 2", exp: "10/100 Mbps Fast Ethernet uses 2 pairs (transmit and receive).[cite: 1]" },
+            { id: 126, cat: 7, text: "Common categories of UTP cable used with Fast Ethernet networks are Cat-5 and Cat-_____.", ans: "6", hint: "Category number after 5", exp: "Cat-5 and Cat-6 are standard UTP grades for Fast Ethernet.[cite: 1]" },
+            { id: 127, cat: 7, text: "A coaxial cable has a single inner conductor surrounded by an insulating layer and an outer conductor acting as a _____.", ans: "ground", hint: "Electrical return path", exp: "The outer woven shield acts as a ground reference and shield.[cite: 1]" },
+            { id: 128, cat: 7, text: "The two commonly used coaxial cable standards are 10Base2 which transmits up to 185m, and 10Base5 which reaches _____ meters.", ans: "500", hint: "Thicknet max distance", exp: "10Base5 (Thicknet) supports maximum lengths of 500 meters.[cite: 1]" },
+            { id: 129, cat: 7, text: "Optical fiber cables transmit data as pulses of _____ instead of electrical currents.", ans: "light", hint: "Photons / optical signals", exp: "Fiber optic cables carry light pulses generated by lasers or LEDs.[cite: 1]" },
+            { id: 130, cat: 7, text: "The inner optical glass conductor that carries light inside a fiber cable is called the _____.", ans: "core", hint: "Center optical glass strand", exp: "Light travels through the inner central glass core.[cite: 1]" },
+            { id: 131, cat: 7, text: "The optical layer surrounding the core that reflects light back into the core is called the _____.", ans: "cladding", hint: "Refractive boundary layer", exp: "Cladding has a lower refractive index, keeping light contained via internal reflection.[cite: 1]" },
+            { id: 132, cat: 7, text: "The outer protective plastic coating of an optical fiber cable is called the _____.", ans: "jacket", hint: "Outer sheath", exp: "The protective plastic jacket protects internal fibers against environmental damage.[cite: 1]" },
+            { id: 133, cat: 7, text: "Optical fiber with a small core (about 9 microns) that uses infrared laser light is _____ -mode fiber.", ans: "Single", hint: "Single path optical fiber", exp: "Single-mode fiber features a narrow core and propagates a single light mode.[cite: 1]" },
+            { id: 134, cat: 7, text: "Optical fiber with a larger core (about 62.5 microns) that uses Light Emitting Diodes (LEDs) is _____ -mode fiber.", ans: "Multi", hint: "Multiple path optical fiber", exp: "Multi-mode fiber permits multiple light paths using LED light sources.[cite: 1]" },
+            { id: 135, cat: 7, text: "Single-mode fibers operate at light wavelengths between 1,300 and _____ nanometers.", ans: "1550", hint: "Upper wavelength boundary in nm", exp: "Single-mode lasers operate at 1300–1550 nm wavelengths.[cite: 1]" },
+            { id: 136, cat: 7, text: "Multi-mode fibers operate at light wavelengths between 850 and _____ nanometers.", ans: "1300", hint: "Upper wavelength boundary for multimode", exp: "Multi-mode LED signals operate between 850–1300 nm.[cite: 1]" },
+            { id: 137, cat: 7, text: "An advantage of fiber optics is that they do not cause electrical _____ in adjacent cables.", ans: "interference", hint: "Crosstalk / EMI", exp: "Because light is non-electrical, optical fibers emit zero electromagnetic interference.[cite: 1]" },
+            { id: 138, cat: 7, text: "Because fiber optic signals degrade very slowly, no signal amplification is needed over distances of hundreds of _____.", ans: "kilometers", hint: "Metric unit of distance", exp: "Low signal attenuation allows optical runs spanning hundreds of kilometers without repeaters.[cite: 1]" },
+            { id: 139, cat: 7, text: "Optical fibers are highly secure against illegal data intercept because they cannot be easily _____.", ans: "tapped", hint: "Eavesdropped or tapped", exp: "Optical cables emit no radiation, making covert physical tapping difficult.[cite: 1]" },
+            { id: 140, cat: 7, text: "A disadvantage of optical fiber is that repairing a broken line is difficult and requires specialized _____.", ans: "equipment", hint: "Tools / fusion splicers", exp: "Splicing fiber optics requires specialized tools and trained technicians.[cite: 1]" },
+
+            // Module 8: Communication & Switching (141-155)
+            { id: 141, cat: 8, text: "Radio, microwave, and satellite data transmissions are classified as _____ media.", ans: "unguided", hint: "Wireless / unbounded channel", exp: "Unguided media transmit signals wirelessly through the atmosphere.[cite: 1]" },
+            { id: 142, cat: 8, text: "The transmission mode where data travels in only one direction at all times is _____ mode.", ans: "simplex", hint: "One-way communication", exp: "Simplex mode permits unidirectional communication (e.g., radio broadcast).[cite: 1]" },
+            { id: 143, cat: 8, text: "The transmission mode where data travels in both directions, but only one direction at a time, is half-_____.", ans: "duplex", hint: "Walkie-talkie mode", exp: "Half-duplex allows bi-directional traffic, but not simultaneously.[cite: 1]" },
+            { id: 144, cat: 8, text: "The transmission mode where data can be transmitted in both directions simultaneously is full-_____.", ans: "duplex", hint: "Simultaneous two-way traffic", exp: "Full-duplex mode enables concurrent send and receive capabilities.[cite: 1]" },
+            { id: 145, cat: 8, text: "The amount of data that can be transferred across a medium in a fixed amount of time is its _____.", ans: "bandwidth", hint: "Data transfer capacity metric", exp: "Bandwidth defines the theoretical maximum data carrying capacity.[cite: 1]" },
+            { id: 146, cat: 8, text: "Bandwidth is traditionally measured in cycles per second, which is also known as _____.", ans: "Hertz", hint: "Frequency unit (Hz)", exp: "Bandwidth frequency is measured in Hertz (Hz) or cycles per second.[cite: 1]" },
+            { id: 147, cat: 8, text: "The gradual loss of signal strength as an electromagnetic wave travels through a medium is called _____.", ans: "attenuation", hint: "Signal decay", exp: "Attenuation is the reduction in signal power over distance.[cite: 1]" },
+            { id: 148, cat: 8, text: "An unwanted alterating change in wave shape during transmission is referred to as signal _____.", ans: "distortion", hint: "Deformation of wave shape", exp: "Distortion modifies the original shape of an analog or digital wave.[cite: 1]" },
+            { id: 149, cat: 8, text: "Connecting every computer directly to every other computer using individual physical links is called point-to-_____ communication.", ans: "point", hint: "Direct link architecture", exp: "Point-to-point connections directly wire sender and receiver.[cite: 1]" },
+            { id: 150, cat: 8, text: "Instead of impractical full point-to-point wiring, computer networks manage traffic sharing using _____.", ans: "switching", hint: "Traffic routing technique", exp: "Switching dynamically routes traffic through shared network nodes.[cite: 1]" },
+            { id: 151, cat: 8, text: "The actual rate of data successfully delivered over a network channel under real conditions is called _____.", ans: "throughput", hint: "Effective data delivery speed", exp: "Throughput measures real-world usable data transmission speeds.[cite: 1]" },
+            { id: 152, cat: 8, text: "Modulation is the process of converting digital computer signals into _____ signals for transmission.", ans: "analog", hint: "Continuous wave signals", exp: "Modulation translates digital bits into continuous analog waves.[cite: 1]" },
+            { id: 153, cat: 8, text: "Demodulation is the process of converting received analog signals back into _____ data.", ans: "digital", hint: "Binary bits", exp: "Demodulation converts incoming analog signals back into binary digits.[cite: 1]" },
+            { id: 154, cat: 8, text: "Combining multiple data signals for simultaneous transmission over a single shared channel is called _____.", ans: "multiplexing", hint: "Signal combining technique", exp: "Multiplexing merges multiple data streams into one physical channel.[cite: 1]" },
+            { id: 155, cat: 8, text: "The multiplexing technique that divides channel bandwidth into distinct frequency ranges is abbreviated as _____.", ans: "FDM", hint: "Frequency Division Multiplexing", exp: "FDM stands for Frequency Division Multiplexing.[cite: 1]" },
+
+            // Module 9: OSI Model & Network Devices (156-175)
+            { id: 156, cat: 9, text: "A network confined to a small local geographic area such as an office or building is a _____.", ans: "LAN", hint: "Local Area Network", exp: "Local Area Networks (LANs) cover small physical footprints.[cite: 1]" },
+            { id: 157, cat: 9, text: "A network that spans an entire city or town geographic area is a _____.", ans: "MAN", hint: "Metropolitan Area Network", exp: "Metropolitan Area Networks (MANs) span municipal regions.[cite: 1]" },
+            { id: 158, cat: 9, text: "A network spanning large geographic areas like countries or continents is a _____.", ans: "WAN", hint: "Wide Area Network", exp: "Wide Area Networks (WANs) connect dispersed systems internationally.[cite: 1]" },
+            { id: 159, cat: 9, text: "The physical or logical arrangement of computers on a network is called network _____.", ans: "topology", hint: "Layout structure", exp: "Topology defines how network nodes are physically or logically arranged.[cite: 1]" },
+            { id: 160, cat: 9, text: "The network topology where all nodes connect to a single central cable backbone is the _____ topology.", ans: "bus", hint: "Linear bus layout", exp: "Bus topology links all devices along a shared central cable.[cite: 1]" },
+            { id: 161, cat: 9, text: "The network topology where all computers are connected in a closed continuous loop is the _____ topology.", ans: "ring", hint: "Circular loop layout", exp: "Ring topology connects nodes sequentially in a closed loop.[cite: 1]" },
+            { id: 162, cat: 9, text: "The network topology where every device connects directly to a central hub or switch is the _____ topology.", ans: "star", hint: "Hub-and-spoke layout", exp: "Star topology connects each endpoint to a central concentrator.[cite: 1]" },
+            { id: 163, cat: 9, text: "The set of agreed rules that govern how devices communicate across a network is a _____.", ans: "protocol", hint: "Communication ruleset", exp: "Protocols standardize software/hardware communication rules.[cite: 1]" },
+            { id: 164, cat: 9, text: "The international standard 7-layer reference model for open networking is the _____ model.", ans: "OSI", hint: "Open Systems Interconnection", exp: "The OSI model specifies 7 functional layers for network interoperability.[cite: 1]" },
+            { id: 165, cat: 9, text: "The OSI layer responsible for node-to-node error-free frame transmission is the Data _____ Layer.", ans: "Link", hint: "Layer 2 of OSI", exp: "The Data Link layer formats data into frames and handles local node delivery.[cite: 1]" },
+            { id: 166, cat: 9, text: "The OSI layer responsible for packet address assignment and routing across networks is the _____ Layer.", ans: "Network", hint: "Layer 3 of OSI", exp: "The Network layer handles logical addressing and routing.[cite: 1]" },
+            { id: 167, cat: 9, text: "The OSI layer responsible for end-to-end reliable data delivery and flow control is the _____ Layer.", ans: "Transport", hint: "Layer 4 of OSI", exp: "The Transport layer manages end-to-end reliability and packet segmentation.[cite: 1]" },
+            { id: 168, cat: 9, text: "An expansion card inside a computer that enables it to physically connect to a network cable is a _____.", ans: "NIC", hint: "Network Interface Card", exp: "Network Interface Cards (NICs) provide physical hardware layer connectivity.[cite: 1]" },
+            { id: 169, cat: 9, text: "A physical layer device that regenerates weakened electrical/optical signals to extend cable distance is a _____.", ans: "repeater", hint: "Signal booster", exp: "Repeaters amplify incoming signals to overcome attenuation.[cite: 1]" },
+            { id: 170, cat: 9, text: "A network device that connects two distinct LAN segments at the Data Link layer is a _____.", ans: "bridge", hint: "Segment interconnection hardware", exp: "Bridges filter and forward traffic between two LAN segments.[cite: 1]" },
+            { id: 171, cat: 9, text: "An intelligent networking device that forwards traffic to specific target ports based on MAC addresses is a _____.", ans: "switch", hint: "Multi-port intelligent bridge", exp: "Switches direct frames exclusively to destination MAC address ports.[cite: 1]" },
+            { id: 172, cat: 9, text: "A network layer device that routes data packets between different networks based on IP addresses is a _____.", ans: "router", hint: "Layer 3 forwarding device", exp: "Routers inter-connect separate IP networks and determine optimal paths.[cite: 1]" },
+            { id: 173, cat: 9, text: "A protocol converter device that connects networks with completely different protocol architectures is a _____.", ans: "gateway", hint: "Protocol translation device", exp: "Gateways translate protocols across disparate system architectures.[cite: 1]" },
+            { id: 174, cat: 9, text: "A short-range wireless technology standard used for exchanging data over short distances (e.g., personal area networks) is _____.", ans: "Bluetooth", hint: "IEEE 802.15.1 standard name", exp: "Bluetooth connects peripherals over short range radio bands.[cite: 1]" },
+            { id: 175, cat: 9, text: "In the OSI model, corresponding layers on different communicating systems are called _____.", ans: "peers", hint: "Equal entities", exp: "Peer layers at the same tier communicate logically with each other.[cite: 1]" },
+
+            // Module 10: HTML, DOM, CSS & E-Commerce (176-200)
+            { id: 176, cat: 10, text: "A private internal network within an organization that uses Internet protocols and web technologies is an _____.", ans: "intranet", hint: "Internal corporate network", exp: "An intranet uses Internet technologies for internal employee use.[cite: 1]" },
+            { id: 177, cat: 10, text: "The tree-like structural representation of HTML elements parsed by browsers is the Document Object _____.", ans: "Model", hint: "DOM middle word", exp: "The DOM (Document Object Model) structures HTML elements into a node tree.[cite: 1]" },
+            { id: 178, cat: 10, text: "The acronym DOM stands for Document Object _____.", ans: "Model", hint: "DOM expansion word 3", exp: "DOM stands for Document Object Model.[cite: 1]" },
+            { id: 179, cat: 10, text: "In HTML, the tag used to create a hyperlink to another web page is the _____ tag.", ans: "a", hint: "Anchor tag letter", exp: "The `<a>` (anchor) tag creates hyperlinks.[cite: 1]" },
+            { id: 180, cat: 10, text: "In HTML, the tag attribute used inside an `<a>` element to specify the target web URL is _____.", ans: "href", hint: "Hypertext reference attribute", exp: "The `href` attribute holds the target destination URL.[cite: 1]" },
+            { id: 181, cat: 10, text: "In HTML, the element tag used to create an unordered bulleted list is _____.", ans: "ul", hint: "Unordered list tag", exp: "The `<ul>` tag defines unordered (bulleted) lists.[cite: 1]" },
+            { id: 182, cat: 10, text: "In HTML, the element tag used to create an ordered numbered list is _____.", ans: "ol", hint: "Ordered list tag", exp: "The `<ol>` tag defines ordered (numbered) lists.[cite: 1]" },
+            { id: 183, cat: 10, text: "In HTML lists, each individual list item must be enclosed within the _____ tag.", ans: "li", hint: "List item tag", exp: "The `<li>` tag defines individual list entries.[cite: 1]" },
+            { id: 184, cat: 10, text: "In HTML, image elements require the _____ attribute to specify the image file path.", ans: "src", hint: "Source path attribute shorthand", exp: "The `src` attribute supplies the image source URL.[cite: 1]" },
+            { id: 185, cat: 10, text: "In HTML, the attribute used on an image element to display alternative text if the image fails to load is _____.", ans: "alt", hint: "Alternate text attribute", exp: "The `alt` attribute provides accessible text for screen readers or missing images.[cite: 1]" },
+            { id: 186, cat: 10, text: "In HTML, line breaks and extra vertical space are inserted using the self-closing `<_____/>` tag.", ans: "br", hint: "Break tag", exp: "The `<br/>` tag creates a line break.[cite: 1]" },
+            { id: 187, cat: 10, text: "HTML comments start with `<!--` and end with `_____`.", ans: "-->", hint: "Comment closing syntax", exp: "HTML comments begin with `<!--` and close with `-->`.[cite: 1]" },
+            { id: 188, cat: 10, text: "To create an HTML input field that hides text for password entry, set `type=\"____\"`.", ans: "password", hint: "Masked input type", exp: "Setting `type=\"password\"` masks user input characters.[cite: 1]" },
+            { id: 189, cat: 10, text: "The acronym CSS stands for Cascading _____ Sheets.", ans: "Style", hint: "CSS middle word", exp: "CSS stands for Cascading Style Sheets.[cite: 1]" },
+            { id: 190, cat: 10, text: "Buying and selling products, services, or information over electronic networks like the Internet is _____.", ans: "e-commerce", hint: "Electronic commerce term", exp: "E-Commerce (Electronic Commerce) covers online buying and selling.[cite: 1]" },
+            { id: 191, cat: 10, text: "The broader transformation of all key business processes using digital technologies is known as e-_____.", ans: "business", hint: "E-Business suffix", exp: "E-Business includes e-commerce plus internal process digitalization.[cite: 1]" },
+            { id: 192, cat: 10, text: "The e-commerce model where businesses sell products or services directly to individual end consumers is _____.", ans: "B2C", hint: "Business to Consumer acronym", exp: "B2C stands for Business-to-Consumer.[cite: 1]" },
+            { id: 193, cat: 10, text: "The e-commerce model where transactions occur between two commercial business entities is _____.", ans: "B2B", hint: "Business to Business acronym", exp: "B2B stands for Business-to-Business.[cite: 1]" },
+            { id: 194, cat: 10, text: "The e-commerce model where consumers sell products or services directly to other consumers is _____.", ans: "C2C", hint: "Consumer to Consumer acronym", exp: "C2C stands for Consumer-to-Consumer (e.g., online auction sites).[cite: 1]" },
+            { id: 195, cat: 10, text: "The e-commerce model focused on providing services, training, and benefits to a company's internal staff is _____.", ans: "B2E", hint: "Business to Employee acronym", exp: "B2E (Business-to-Employee) targets internal workforce retention and recruitment.[cite: 1]" },
+            { id: 196, cat: 10, text: "Online retail selling on web stores is frequently referred to as e-_____.", ans: "tailing", hint: "Electronic retailing term suffix", exp: "E-tailing is shorthand for electronic retailing.[cite: 1]" },
+            { id: 197, cat: 10, text: "A central online site hosting multiple virtual online stores is called a virtual _____.", ans: "mall", hint: "Or cybermall", exp: "Virtual malls aggregate multiple distinct online storefronts.[cite: 1]" },
+            { id: 198, cat: 10, text: "Key drivers of e-commerce adoption across nations include technological, political, economic, and _____ factors.", ans: "social", hint: "Human / education factor", exp: "Social factors incorporate IT literacy and education levels.[cite: 1]" },
+            { id: 199, cat: 10, text: "In CSS, to apply identical styling rules to multiple elements at once (like `td` and `th`), selectors are separated by a _____.", ans: "comma", hint: "Punctuation delimiter", exp: "Commas group multiple selectors in CSS rules.[cite: 1]" },
+            { id: 200, cat: 10, text: "The HTML container tag used to collect user input data for server submission is the `<_____>` tag.", ans: "form", hint: "Form container element", exp: "The `<form>` element encapsulates input fields for data submission.[cite: 1]" },
+
+            // Module 11: Network Importance, Media & Transmission (201-225)
+            { id: 201, cat: 11, text: "Networking facilitates the sharing of physical _____ such as printers and scanners.", ans: "resources", hint: "Devices or hardware", exp: "Networking facilitates sharing of physical resources such as printers regardless of physical location." },
+            { id: 202, cat: 11, text: "Networked computers provide a fast and cost-effective communication _____ via e-mail.", ans: "medium", hint: "Channel or method", exp: "Networking helps in sending and receiving of e-mail messages, making it an efficient communication medium." },
+            { id: 203, cat: 11, text: "Critical data can be preserved on networked computers by taking a _____ to prevent loss.", ans: "back-up", hint: "Data copy", exp: "Networked computers can be used to take back-up of critical data." },
+            { id: 204, cat: 11, text: "Data transmission media where signals are sent along a specific wire or cable are called _____ media.", ans: "guided", hint: "Directed or bounded", exp: "In guided media, the data signals are sent along a specific path, through a wire or a cable." },
+            { id: 205, cat: 11, text: "Copper wire offers low _____ to electric current, allowing signals to travel longer distances.", ans: "resistance", hint: "Opposition to current", exp: "Copper wires offer low resistance to current signal, facilitating signals to travel longer distances." },
+            { id: 206, cat: 11, text: "A twisted pair cable consists of four pairs of copper wires coated with insulating material like plastic or _____.", ans: "Teflon", hint: "A synthetic fluoropolymer", exp: "A twisted pair cable consists of four pairs of copper wires coated with an insulating material like plastic or Teflon." },
+            { id: 207, cat: 11, text: "Twisting copper wires helps reduce electromagnetic _____ from external sources.", ans: "interference", hint: "Disruption or noise", exp: "The twisting of wires reduces electromagnetic interference from external sources." },
+            { id: 208, cat: 11, text: "Shielded Twisted Pair (STP) features an extra layer of metal _____ beneath the outer covering.", ans: "foil", hint: "Thin sheet of metal", exp: "STP cable has an extra layer of metal foil between the twisted pair of copper wires and the outer covering." },
+            { id: 209, cat: 11, text: "Fast Ethernet communication over a UTP cable typically utilizes only _____ pairs of the available wires.", ans: "two", hint: "A number", exp: "Out of the four pairs of wires in a UTP cable, only two pairs are used for communication." },
+            { id: 210, cat: 11, text: "A coaxial cable contains a single inner conductor for transmission, while the outer conductor acts as a _____.", ans: "ground", hint: "Electrical return path", exp: "A coaxial cable has a single inner conductor that transmits electric signals; the outer conductor acts as a ground." },
+            { id: 211, cat: 11, text: "Ideal coaxial cables confine the electromagnetic signal strictly to the _____ between the inner and outer conductors.", ans: "space", hint: "Area or gap", exp: "In an ideal coaxial cable the electromagnetic field carrying the signal exists only in the space between the inner and outer conductors." },
+            { id: 212, cat: 11, text: "In optical fibers, the glass conductor that transmits the light is known as the _____.", ans: "core", hint: "The center part", exp: "An optical fiber cable consists of a core–optical fiber conductor (glass) that transmits light." },
+            { id: 213, cat: 11, text: "The _____ is an optical material surrounding the fiber's core that prevents light from escaping.", ans: "cladding", hint: "Outer optical layer", exp: "Cladding is an optical material that surrounds the core to prevent any light from escaping the core." },
+            { id: 214, cat: 11, text: "Single-mode optical fibers transmit infrared _____ light.", ans: "laser", hint: "Coherent light beam", exp: "Single-mode fibers have small cores and transmit infrared laser light." },
+            { id: 215, cat: 11, text: "Multi-mode optical fibers transmit light generated by Light Emitting _____.", ans: "Diodes", hint: "LED expansion", exp: "Multi-mode fibers transmit infrared light from Light Emitting Diodes (LEDs)." },
+            { id: 216, cat: 11, text: "Fiber optics do not cause electrical _____ in adjacent cables because they use light signals.", ans: "interference", hint: "Disturbance to signals", exp: "Optical fibers do not cause electrical interference in other cables, since they use light signals." },
+            { id: 217, cat: 11, text: "Because optical signals degrade very slowly, no signal _____ is needed over hundreds of kilometers.", ans: "amplification", hint: "Boosting or increasing", exp: "No amplification of the optical signal is needed over distances of hundreds of kilometers." },
+            { id: 218, cat: 11, text: "Radio, microwave, and satellite systems are classified as _____ media.", ans: "unguided", hint: "Wireless channels", exp: "Radio, microwave, and satellite transmissions fall into the unguided media category." },
+            { id: 219, cat: 11, text: "The transmission mode where data flows in only one direction is called _____.", ans: "Simplex", hint: "Unidirectional mode", exp: "Simplex transmission is unidirectional data transmission." },
+            { id: 220, cat: 11, text: "The transmission mode allowing bi-directional data flow, but not at the same time, is _____-duplex.", ans: "Half", hint: "Partial bi-directional", exp: "Half–duplex transmission is bi-directional data transmission, but the linked devices cannot send and receive at the same time." },
+            { id: 221, cat: 11, text: "The theoretical maximum amount of data transferred through a medium in a fixed time is its _____.", ans: "Bandwidth", hint: "Capacity", exp: "Bandwidth is the amount of data that can be transferred through the underlying hardware." },
+            { id: 222, cat: 11, text: "The actual rate at which data is successfully transmitted between computers is the _____.", ans: "Throughput", hint: "Actual delivery speed", exp: "Throughput is the amount of data that is actually transmitted between the two computers." },
+            { id: 223, cat: 11, text: "Bandwidth frequency is typically measured in cycles per second, commonly referred to as _____.", ans: "Hertz", hint: "Hz abbreviation", exp: "Bandwidth is measured in cycles per second (cps) or Hertz (Hz)." },
+            { id: 224, cat: 11, text: "A device that performs both modulation and demodulation of signals is a _____.", ans: "Modem", hint: "Network translator device", exp: "Modem is a device that has both a modulator and a demodulator." },
+            { id: 225, cat: 11, text: "A modulator converts computer data signals to modulate the _____ wave for transmission.", ans: "carrier", hint: "Wave bearing the signal", exp: "Modulator accepts data signals from the computer and modulates the carrier wave accordingly." },
+
+            // Module 12: Switching, Topologies & OSI (226-250)
+            { id: 226, cat: 12, text: "To prevent idle communication links, networks manage data traffic routing using _____.", ans: "switching", hint: "Routing mechanism", exp: "Networks allow sharing of communication medium using switching, which routes the traffic on the network." },
+            { id: 227, cat: 12, text: "Telephone networks typically allocate a dedicated path using _____ switching.", ans: "circuit", hint: "Continuous connection type", exp: "Circuit switching is commonly used in the telephone communication." },
+            { id: 228, cat: 12, text: "Message switching utilizes a 'store and _____' mechanism instead of establishing a physical path in advance.", ans: "forward", hint: "Relay mechanism", exp: "Message switching uses the 'store and forward' mechanism." },
+            { id: 229, cat: 12, text: "Because it may block network nodes for extended periods, message switching is unsuitable for _____ communication.", ans: "interactive", hint: "Two-way real-time", exp: "Message switching may block the network nodes for a long time. They are thus not suitable for interactive communication." },
+            { id: 230, cat: 12, text: "Computer networks like the Internet commonly route data dynamically using _____ switching.", ans: "packet", hint: "Data segment routing", exp: "Packet switching is commonly used for computer networks, including the Internet." },
+            { id: 231, cat: 12, text: "Packet switching reassembles arriving data at the destination according to the packet _____.", ans: "number", hint: "Sequence identifier", exp: "At the destination, the received packets are reassembled (according to the packet number)." },
+            { id: 232, cat: 12, text: "A network that connects computers within a small area, like a single building, is a _____.", ans: "LAN", hint: "Local Area Network", exp: "LAN connects computers in a small area like a room, building, office or a campus." },
+            { id: 233, cat: 12, text: "A LAN based on Wi-Fi technology is referred to as a _____ LAN.", ans: "Wireless", hint: "No physical wires", exp: "A LAN based on WiFi wireless network technology is called Wireless LAN." },
+            { id: 234, cat: 12, text: "A network that spans entire countries or continents is classified as a _____.", ans: "WAN", hint: "Wide Area Network", exp: "WAN connects computers across countries or continents." },
+            { id: 235, cat: 12, text: "In a Bus topology, a central cable acts as the backbone, and signals are absorbed at the ends by a _____.", ans: "terminator", hint: "End point device", exp: "The data signal is finally absorbed by the terminator attached to the end of the network." },
+            { id: 236, cat: 12, text: "A Ring topology connects devices in a closed circle and utilizes a _____ passing method to grant network access.", ans: "token", hint: "Access control method", exp: "Ring topology uses token passing method to provide access to the devices in the network." },
+            { id: 237, cat: 12, text: "In a Star topology, all computers connect to a central link, typically a hub or _____.", ans: "switch", hint: "Networking central unit", exp: "The central link is a hub or switch." },
+            { id: 238, cat: 12, text: "If the central hub in a Star topology fails, the entire network will _____ down.", ans: "break", hint: "Stop working", exp: "Failure of the hub or switch breaks the complete network." },
+            { id: 239, cat: 12, text: "Ethernet and LocalTalk are common protocols used to implement the _____ topology.", ans: "Star", hint: "Hub-based layout", exp: "The common protocols used in star topology are Ethernet, Token Ring, and LocalTalk." },
+            { id: 240, cat: 12, text: "The ISO developed a reference model for data networks known as the Open System _____ (OSI) model.", ans: "Interconnection", hint: "Network model name", exp: "The International Standards Organization (ISO) has developed a seven-layer reference model... known as Open System Interconnection (OSI) model." },
+            { id: 241, cat: 12, text: "The OSI model organizes network communication protocols into a stack of _____ layers.", ans: "seven", hint: "Number 7", exp: "The International Standards Organization (ISO) has developed a seven-layer reference model..." },
+            { id: 242, cat: 12, text: "In the OSI model, corresponding layers on different interacting machines are called _____.", ans: "peers", hint: "Equivalent entities", exp: "The corresponding layers on the different machines are called peers." },
+            { id: 243, cat: 12, text: "The _____ layer specifies node-to-node frame transmission and error detection.", ans: "Data Link", hint: "Layer 2", exp: "Data Link Layer—This layer specifies the functions required for node-to-node transmission without errors." },
+            { id: 244, cat: 12, text: "The _____ layer handles the assignment of addresses to packets and packet forwarding.", ans: "Network", hint: "Layer 3", exp: "Network Layer—The network layer specifies the assignment of addresses... to the packets and forwarding." },
+            { id: 245, cat: 12, text: "The _____ layer manages end-to-end reliable data transfer and flow control.", ans: "Transport", hint: "Layer 4", exp: "Transport Layer—It specifies the details to handle reliable transfer of data. It handles end-to-end error control." },
+            { id: 246, cat: 12, text: "The Presentation layer handles the translation, encryption, and _____ of data.", ans: "decryption", hint: "Reverse of encryption", exp: "Its functions include translation of the representation of the data... encryption, and decryption of data." },
+            { id: 247, cat: 12, text: "The TCP/IP Internet protocol is traditionally organized into _____ layers.", ans: "five", hint: "A number", exp: "For example, the TCP/IP Internet protocol is organized into five layers." },
+            { id: 248, cat: 12, text: "A Network Interface Card (NIC) embeds a globally unique hardware identifier known as the _____ address.", ans: "MAC", hint: "Media Access Control", exp: "NIC converts the data packets into data frames, adds the Media Access address (MAC address) to data frames." },
+            { id: 249, cat: 12, text: "A _____ amplifies signals to restore their original strength, allowing LANs to extend their physical reach.", ans: "repeater", hint: "Signal extender", exp: "Repeaters amplify the signal so that the signal is as strong as the original signal." },
+            { id: 250, cat: 12, text: "A repeater operates purely at the _____ layer of the OSI model.", ans: "Physical", hint: "Lowest layer", exp: "Repeaters operate at the Physical layer of OSI reference model." },
+
+            // Module 13: Network Devices & Wireless (251-275)
+            { id: 251, cat: 13, text: "A _____ connects two LAN segments and filters traffic without forwarding electrical interference.", ans: "bridge", hint: "Connecting device", exp: "Bridge is used to connect two LAN segments... It does not forward any electrical interference signals to the other segment." },
+            { id: 252, cat: 13, text: "Bridges connect networks using different protocols at the _____ Layer by converting frame formats.", ans: "Data Link", hint: "Layer 2", exp: "Bridge connects networks that use different protocol at the Data Link Layer." },
+            { id: 253, cat: 13, text: "A hub broadcasts incoming data to all devices attached to its ports, heavily increasing network _____.", ans: "traffic", hint: "Data flow volume", exp: "Hubs increase the network traffic because they broadcast data to all the device connected all the ports of the hub." },
+            { id: 254, cat: 13, text: "A _____ reads the MAC address of a data frame and forwards it only to the specific destination port.", ans: "switch", hint: "Intelligent hub alternative", exp: "Switching is a technique that reads the MAC address of the data frame and forwards the data to the appropriate port." },
+            { id: 255, cat: 13, text: "A switch creates a simulated LAN _____ for each individual computer attached to it.", ans: "segment", hint: "Network division", exp: "In a switch each computer attached to a switch has a simulated LAN segment." },
+            { id: 256, cat: 13, text: "A Router connects heterogeneous networks and operates at the _____ layer.", ans: "Network", hint: "Layer 3", exp: "Router operates at the Network layer of the OSI model." },
+            { id: 257, cat: 13, text: "Because they work at layer 3, routers move data packets based on their _____ addresses.", ans: "IP", hint: "Internet Protocol address", exp: "Since it works at the Network layer, it moves packets based on the IP addresses." },
+            { id: 258, cat: 13, text: "A _____ translates messages and converts protocols between completely dissimilar networks.", ans: "gateway", hint: "Protocol converter", exp: "A gateway at the transport layer converts protocols among communications networks." },
+            { id: 259, cat: 13, text: "Wireless networks transmit data encoded on _____ waves through the air.", ans: "electromagnetic", hint: "Type of wave", exp: "In wireless technology data is encoded on electromagnetic waves that travel through air." },
+            { id: 260, cat: 13, text: "A wireless network access point consists of a _____ and defines the coverage area.", ans: "transmitter", hint: "Signal emitter", exp: "The wireless access points that include the transmitter along with the area it can cover." },
+            { id: 261, cat: 13, text: "High-frequency wireless signals require a clearer line of _____ compared to lower frequencies.", ans: "sight", hint: "Visual path", exp: "Higher frequencies require a clear line of sight as compared to lower frequencies." },
+            { id: 262, cat: 13, text: "File Transfer Protocol (FTP) shields users from differences in remote computer operating systems and _____ structures.", ans: "file", hint: "Data storage organization", exp: "FTP shields users from these differences in operating systems... directory structures, file structures, and formats." },
+            { id: 263, cat: 13, text: "When using anonymous FTP, the user login is 'anonymous' and the password is the user's _____.", ans: "email", hint: "Contact address", exp: "The user uses the anonymous login, where the User Login is anonymous and password is the email address." },
+            { id: 264, cat: 13, text: "The FTP command used to retrieve multiple files from a remote server is _____.", ans: "mget", hint: "Multiple get", exp: "mget filename (Retrieve multiple files from server)." },
+            { id: 265, cat: 13, text: "_____ uses the telecommunication network to execute commands on a host computer, but unlike FTP, it does not transfer files.", ans: "Telnet", hint: "Remote login tool", exp: "Telnet allows access to the computing facility of the host computer but does not allow transfer of files." },
+            { id: 266, cat: 13, text: "Internet Relay Chat (IRC) software facilitates communication between users in _____ time.", ans: "real", hint: "Immediate communication", exp: "IRC allows users to communicate in real time by typing text." },
+            { id: 267, cat: 13, text: "Using the internet for online ticket booking or filing income tax is classified as E-_____.", ans: "Governance", hint: "Electronic government services", exp: "E-Governance (online filing of application (Income Tax), on-line application forms etc.)" },
+            { id: 268, cat: 13, text: "In current IT trends, UAVs are commonly referred to as _____.", ans: "Drones", hint: "Unmanned aerial vehicles", exp: "Drones and Unmanned Aerial Vehicles are listed under current IT trends." },
+            { id: 269, cat: 13, text: "The technological trend focused on financial technology and digital transactions is known as _____.", ans: "Fintech", hint: "Financial technology", exp: "Fintech is listed under Current Trends in Computing." },
+            { id: 270, cat: 13, text: "Wearables and smart household devices are part of the Internet of _____ trend.", ans: "Things", hint: "IoT expansion", exp: "Internet of Things and Wearables is listed under Current Trends in Computing." },
+            { id: 271, cat: 13, text: "In HTML, the element that contains page information not necessarily displayed to the user is the _____ tag.", ans: "head", hint: "Top element of document", exp: "The head element will include information about your page that is not necessarily displayed." },
+            { id: 272, cat: 13, text: "In an HTML document, each nested element should be _____ slightly to make the code easier to read.", ans: "indented", hint: "Spaced inward", exp: "Notice how each of the inner elements is indented just a bit further than the last." },
+            { id: 273, cat: 13, text: "HTML tags can include _____, like `lang=\"en\"`, to give the browser extra configuration information.", ans: "attributes", hint: "Additional tag info", exp: "HTML elements can include attributes, which give the browser extra information about the element." },
+            { id: 274, cat: 13, text: "The HTML `<tr>` tag defines a table _____.", ans: "row", hint: "Horizontal line of cells", exp: "The `<tr>` tag is used to create a row in a table." },
+            { id: 275, cat: 13, text: "A B2B connection where businesses directly connect to high-volume trading partners via the internet to save on Service Provider fees is a _____ model.", ans: "hybrid", hint: "Combination model", exp: "The hybrid approach to B2B is a combination of the direct and network models." },
+
+            // Module 14: Internet Services & HTML (276-300)
+            { id: 276, cat: 14, text: "In an organization, networking is beneficial because resources such as scanners are not required by each person at _____ times.", ans: "all", hint: "Every single moment", exp: "In an organization, resources such as printers and scanners are generally not required by each person at all times." },
+            { id: 277, cat: 14, text: "Using the Internet for online classes and virtual classrooms is a major application in _____.", ans: "Education", hint: "Learning sector", exp: "Education (e-learning courses, virtual classroom, distance learning) is a major use of the Internet." },
+            { id: 278, cat: 14, text: "Communication between computers involves a sender, receiver, a language, and a _____.", ans: "medium", hint: "Transmission channel", exp: "The communication process involves—sender... receiver... language... and medium used." },
+            { id: 279, cat: 14, text: "Engineers who design hardware generally handle the encoding of bits into signals at the _____ level.", ans: "physical", hint: "Hardware hardware tier", exp: "Data transmission at physical level involves the hardware required for handling individual bits and encoding bits." },
+            { id: 280, cat: 14, text: "Connecting every computer directly to every other computer via physical links is called _____ to point communication.", ans: "point", hint: "Direct connection type", exp: "Any two devices directly linked via a communication medium (point to point communication)." },
+            { id: 281, cat: 14, text: "The computer network provides an interface that handles sending data across the network instead of handling it at the _____ level.", ans: "physical", hint: "Hardware tier", exp: "The computer network provides a convenient interface that handles sending of multiple bytes of data... instead of handling data transmission at physical level." },
+            { id: 282, cat: 14, text: "In message switching, network nodes require large data _____ capacity to hold messages before forwarding.", ans: "storage", hint: "Memory capacity", exp: "Message switching requires large data storage capacity." },
+            { id: 283, cat: 14, text: "Packet switching allows a node to transmit a packet even before the arrival of another _____ packet, reducing delay.", ans: "full", hint: "Complete packet", exp: "A node can transmit a packet before the arrival of another full packet, thus reducing the delay." },
+            { id: 284, cat: 14, text: "A network's _____ defines the arrangement or shape of computers on the network.", ans: "topology", hint: "Network shape", exp: "Network topology refers to the arrangement of computers on the network or the shape of the network." },
+            { id: 285, cat: 14, text: "In a bus topology, the signal carries the _____ of the destination computer to ensure it reaches the right node.", ans: "address", hint: "Identifier location", exp: "The data signal carries the address of the destination computer." },
+            { id: 286, cat: 14, text: "Bus topology is generally good for connecting up to 15 to _____ computers.", ans: "20", hint: "A number", exp: "It is good for connecting 15–20 computers." },
+            { id: 287, cat: 14, text: "Ring topology connects nodes sequentially, usually using twisted pair, coaxial, or optic _____.", ans: "fibers", hint: "Glass cables", exp: "The computers or devices are connected to the ring using twisted pair cables, coaxial cables or optic fibers." },
+            { id: 288, cat: 14, text: "In star topology, adding additional computers can cause the network to slow _____.", ans: "down", hint: "Decrease in speed", exp: "Network slows down if additional computers are connect to the network." },
+            { id: 289, cat: 14, text: "In the OSI model, outgoing data passes _____ through each layer, while incoming data passes up.", ans: "down", hint: "Direction", exp: "The outgoing data from a computer connected to the network passes down through each layer." },
+            { id: 290, cat: 14, text: "The OSI Application layer deals with the _____ attached to the network data.", ans: "services", hint: "Application functions", exp: "It deals with the services attached to the data." },
+            { id: 291, cat: 14, text: "The X.25 Wide Area Network was the first public data network and provided connectivity to the _____.", ans: "PSTN", hint: "Public Switched Telephone Network acronym", exp: "The X.25 Wide Area Network protocol... provides connectivity to Public Switched Telephone Network (PSTN)." },
+            { id: 292, cat: 14, text: "A concentrator amplifies incoming signals and provides an _____ to connect multiple devices.", ans: "interface", hint: "Connection point", exp: "It provides an interface to connect multiple computers and devices in a network." },
+            { id: 293, cat: 14, text: "A NIC is an _____ card that can be either ISA, PCI, or integrated on a motherboard chipset.", ans: "expansion", hint: "Add-on card type", exp: "NIC is an expansion card, it can be either ISA or PCI." },
+            { id: 294, cat: 14, text: "Bridges create separate broadcast _____ to reduce network traffic.", ans: "domains", hint: "Network zones", exp: "A bridge is also used to divide a network into separate broadcast domains to reduce network traffic." },
+            { id: 295, cat: 14, text: "Unlike a switch, a hub simulates a single shared _____ for all attached computers.", ans: "segment", hint: "Network division", exp: "A hub simulates a single segment that is shared by all computers attached to it." },
+            { id: 296, cat: 14, text: "The coverage area of a wireless access point depends heavily on the output _____ of its transmitter.", ans: "power", hint: "Signal strength", exp: "The coverage area of a transmitter depends on the output power of the transmitter." },
+            { id: 297, cat: 14, text: "The FTP command `put filename` is used to copy a _____ file to the server.", ans: "local", hint: "Computer's own file", exp: "put filename (copy local file to server)." },
+            { id: 298, cat: 14, text: "FTP encourages the indirect use of _____ computers by allowing robust file sharing.", ans: "remote", hint: "Distant computers", exp: "FTP encourages indirect use of remote computers." },
+            { id: 299, cat: 14, text: "In HTML, the element that encapsulates the visible part of the website is the _____ element.", ans: "body", hint: "Main content section", exp: "The body element will contain what is actually visible to users who visit the site." },
+            { id: 300, cat: 14, text: "In CSS, we can alter a property directly on an HTML element by adding a _____ attribute.", ans: "style", hint: "Inline CSS attribute", exp: "We can add a style attribute to any HTML element in order to apply some CSS to it." }
+        ];
+
+        let revealAllState = false;
+
+        function renderQuestions(items) {
+            const container = document.getElementById("questionsContainer");
+            container.innerHTML = "";
+
+            if (items.length === 0) {
+                container.innerHTML = `<div class="bg-white p-8 text-center text-slate-500 rounded-xl shadow">No questions match your current search or category filter.</div>`;
+                return;
+            }
+
+            items.forEach((q) => {
+                const card = document.createElement("div");
+                card.className = "bg-white p-5 rounded-xl shadow-sm border border-slate-200 transition hover:shadow-md";
+                card.id = `card-${q.id}`;
+
+                // Format text with blank input
+                const parts = q.text.split("_____");
+                const questionHTML = `
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-md border border-indigo-200">
+                            Q${q.id}
+                        </span>
+                        <span class="text-xs text-slate-400 font-mono">Module ${q.cat}</span>
+                    </div>
+                    <div class="text-slate-800 font-medium text-base leading-relaxed mb-4">
+                        ${parts[0]}
+                        <input type="text" id="input-${q.id}" onkeyup="handleKey(${q.id}, event)" onblur="checkAnswer(${q.id})" 
+                               class="blank-input px-2 py-0.5 min-w-[120px] max-w-[200px]" placeholder="your answer..." autocomplete="off">
+                        ${parts[1] || ""}
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs">
+                        <div class="flex items-center gap-2">
+                            <button onclick="checkAnswer(${q.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded font-semibold transition">
+                                Check
+                            </button>
+                            <button onclick="toggleHint(${q.id})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded transition">
+                                <i class="fa-regular fa-lightbulb text-amber-500 mr-1"></i> Hint
+                            </button>
+                            <button onclick="showExplanation(${q.id})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded transition">
+                                <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Answer Key
+                            </button>
+                        </div>
+                        <span id="feedback-${q.id}" class="font-bold text-xs"></span>
+                    </div>
+                    <div id="hint-${q.id}" class="hidden mt-2 p-2.5 bg-amber-50 text-amber-900 border border-amber-200 rounded text-xs">
+                        <strong>Hint:</strong> ${q.hint}
+                    </div>
+                    <div id="exp-${q.id}" class="hidden mt-2 p-2.5 bg-blue-50 text-blue-950 border border-blue-200 rounded text-xs space-y-1">
+                        <div><strong>Target Answer:</strong> <span class="text-indigo-700 font-bold font-mono">${q.ans}</span></div>
+                        <div><strong>Explanation:</strong> ${q.exp}</div>
+                    </div>
+                `;
+
+                card.innerHTML = questionHTML;
+                container.appendChild(card);
+            });
+
+            updateProgress();
+        }
+
+        function handleKey(id, event) {
+            if (event.key === "Enter") {
+                checkAnswer(id);
+            }
+        }
+
+        function checkAnswer(id) {
+            const q = questionsData.find(item => item.id === id);
+            const input = document.getElementById(`input-${id}`);
+            const feedback = document.getElementById(`feedback-${id}`);
+            if (!input) return;
+
+            const userVal = input.value.trim().toLowerCase();
+            const targetVal = q.ans.trim().toLowerCase();
+
+            if (userVal === "") {
+                input.className = "blank-input px-2 py-0.5 min-w-[120px] max-w-[200px]";
+                feedback.innerHTML = "";
+                updateProgress();
+                return;
+            }
+
+            // Flexibly match answer
+            if (userVal === targetVal || targetVal.includes(userVal) && userVal.length > 2) {
+                input.className = "blank-input px-2 py-0.5 min-w-[120px] max-w-[200px] correct-bg";
+                feedback.className = "font-bold text-xs text-emerald-600";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check"></i> Correct`;
+            } else {
+                input.className = "blank-input px-2 py-0.5 min-w-[120px] max-w-[200px] incorrect-bg";
+                feedback.className = "font-bold text-xs text-rose-600";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Incorrect`;
+            }
+
+            updateProgress();
+        }
+
+        function checkAllAnswers() {
+            questionsData.forEach(q => {
+                const input = document.getElementById(`input-${q.id}`);
+                if (input && input.value.trim() !== "") {
+                    checkAnswer(q.id);
+                }
+            });
+        }
+
+        function toggleHint(id) {
+            const el = document.getElementById(`hint-${id}`);
+            if (el) el.classList.toggle("hidden");
+        }
+
+        function showExplanation(id) {
+            const el = document.getElementById(`exp-${id}`);
+            if (el) el.classList.toggle("hidden");
+        }
+
+        function toggleRevealAll() {
+            revealAllState = !revealAllState;
+            const btnText = document.getElementById("revealText");
+            btnText.innerText = revealAllState ? "Hide Answers" : "Reveal Answers";
+
+            questionsData.forEach(q => {
+                const expEl = document.getElementById(`exp-${q.id}`);
+                const input = document.getElementById(`input-${q.id}`);
+                if (expEl) {
+                    if (revealAllState) {
+                        expEl.classList.remove("hidden");
+                        if (input && input.value === "") {
+                            input.value = q.ans;
+                            checkAnswer(q.id);
+                        }
+                    } else {
+                        expEl.classList.add("hidden");
+                    }
+                }
+            });
+        }
+
+        function resetAll() {
+            if (confirm("Are you sure you want to reset all answers and progress?")) {
+                questionsData.forEach(q => {
+                    const input = document.getElementById(`input-${q.id}`);
+                    const feedback = document.getElementById(`feedback-${q.id}`);
+                    const hint = document.getElementById(`hint-${q.id}`);
+                    const exp = document.getElementById(`exp-${q.id}`);
+
+                    if (input) {
+                        input.value = "";
+                        input.className = "blank-input px-2 py-0.5 min-w-[120px] max-w-[200px]";
+                    }
+                    if (feedback) feedback.innerHTML = "";
+                    if (hint) hint.classList.add("hidden");
+                    if (exp) exp.classList.add("hidden");
+                });
+                revealAllState = false;
+                document.getElementById("revealText").innerText = "Reveal Answers";
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            let answeredCount = 0;
+            let correctCount = 0;
+
+            questionsData.forEach(q => {
+                const input = document.getElementById(`input-${q.id}`);
+                if (input && input.value.trim() !== "") {
+                    answeredCount++;
+                    const userVal = input.value.trim().toLowerCase();
+                    const targetVal = q.ans.trim().toLowerCase();
+                    if (userVal === targetVal || (targetVal.includes(userVal) && userVal.length > 2)) {
+                        correctCount++;
+                    }
+                }
+            });
+
+            const total = questionsData.length;
+            const percentage = Math.round((correctCount / total) * 100);
+
+            document.getElementById("progressText").innerText = `Progress: ${answeredCount} / ${total} Answered`;
+            document.getElementById("scoreText").innerText = `Score: ${correctCount} / ${total} (${percentage}%)`;
+            document.getElementById("progressBar").style.width = `${(answeredCount / total) * 100}%`;
+        }
+
+        function filterQuestions() {
+            const catVal = document.getElementById("categoryFilter").value;
+            const searchVal = document.getElementById("searchInput").value.toLowerCase().trim();
+
+            const filtered = questionsData.filter(q => {
+                const matchesCat = (catVal === "all") || (q.cat.toString() === catVal);
+                const matchesSearch = q.text.toLowerCase().includes(searchVal) || 
+                                      q.ans.toLowerCase().includes(searchVal) ||
+                                      q.exp.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            renderQuestions(filtered);
+        }
+
+        // Initialize on page load
+        window.onload = () => {
+            renderQuestions(questionsData);
+        };
+    </script>
+</body>
+</html>
